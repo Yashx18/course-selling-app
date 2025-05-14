@@ -22,6 +22,6 @@ app.use("/course", courseRouter);
 // app.post("/admin/delete-course", function (req, res) {});
 // app.post("/admin/course-content", function (req, res) {});
 
-// app.listen(port, (req, res) => {
-//   console.log(`Server is running on http://localhost:${port}`);
-// });
+app.listen(port, (req, res) => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
