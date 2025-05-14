@@ -8,7 +8,11 @@ userRouter.post("/signup", function (req, res) {});
 
 userRouter.post("/login", function (req, res) {});
 
-userRouter.get("/purchases", function (req, res) {});
+userRouter.get("/purchases", function (req, res) {
+  res.send({
+    message: "Working!!",
+  });
+});
 
 module.exports = {
   userRouter: userRouter,

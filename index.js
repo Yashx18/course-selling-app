@@ -2,6 +2,7 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const { userRouter } = require("./routes/user.js");
 const { courseRouter } = require("./routes/course.js");
+const { adminRouter } = require("./routes/admin.js");
 
 const app = express();
 const port = 3000;
@@ -13,14 +14,8 @@ app.use("/user", userRouter);
 // Router for Courses.
 app.use("/course", courseRouter);
 
-// USER SECTION
-
-// ADMIN SECTION
-// app.post("/admin/signup", function (req, res) {});
-// app.post("/admin/login", function (req, res) {});
-// app.post("/admin/create-course", function (req, res) {});
-// app.post("/admin/delete-course", function (req, res) {});
-// app.post("/admin/course-content", function (req, res) {});
+// Router for Admin.
+app.use("/admin", adminRouter);
 
 app.listen(port, (req, res) => {
   console.log(`Server is running on http://localhost:${port}`);
