@@ -33,10 +33,10 @@ adminRouter.post("/signup", async function (req, res) {
     return;
   }
 
-  const existingUser = await adminModel.findOne({
+  const existingadmin = await adminModel.findOne({
     email,
   });
-  if (existingUser) {
+  if (existingadmin) {
     res.json({
       message: "Email already in use.",
     });
@@ -65,21 +65,21 @@ adminRouter.post("/login", async function (req, res) {
   }
   const { email, password } = req.body;
 
-  const user = await adminModel.findOne({ email });
+  const admin = await adminModel.findOne({ email });
 
-  if (!user) {
+  if (!admin) {
     res.json({
-      message: "User not found.",
+      message: "admin not found.",
     });
     return;
   }
 
-  const isValidPassword = await bcrypt.compare(password, user.password);
+  const isValidPassword = await bcrypt.compare(password, admin.password);
 
-  if ((isValidPassword, user)) {
+  if ((isValidPassword, admin)) {
     const token = jwt.sign(
       {
-        id: user._id,
+        id: admin._id,
       },
       JWT_ADMIN_SECRET
     );
