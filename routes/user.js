@@ -7,7 +7,7 @@ const { userModel } = require("../db.js");
 const { z } = require("zod");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { JWT_USER_SECRET } = require("../auth.js");
+const { JWT_USER_SECRET } = require("../config.js");
 
 const signupSchema = z.object({
   email: z.string().email(),
@@ -55,7 +55,7 @@ userRouter.post("/login", async function (req, res) {
     res.json({
       message: "Invalid Data Format.",
     });
-    return
+    return;
   }
   const user = await userModel.findOne({
     email,
@@ -68,7 +68,7 @@ userRouter.post("/login", async function (req, res) {
   }
   const isValidPassword = await bcrypt.compare(password, user.password);
 
-  if ((user && isValidPassword)) {
+  if (user && isValidPassword) {
     const token = jwt.sign(
       {
         id: user._id,
