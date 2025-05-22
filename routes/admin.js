@@ -7,6 +7,7 @@ const { z } = require("zod");
 
 const { JWT_ADMIN_SECRET } = require("../config.js");
 const { adminAuth } = require("../middlewares/adminM.js");
+const { error } = require("console");
 
 // SignUp Schema
 const signupSchema = z.object({
@@ -45,11 +46,14 @@ adminRouter.post("/signup", async function (req, res) {
   const existingadmin = await adminModel.findOne({
     email,
   });
+
   if (existingadmin) {
     res.json({
       message: "Email already in use.",
     });
+    return;
   }
+
   const hashedPassword = await bcrypt.hash(password, 10);
 
   await adminModel.create({
@@ -58,6 +62,7 @@ adminRouter.post("/signup", async function (req, res) {
     firstName,
     lastName,
   });
+
   res.json({
     message: "Signed in Successfully.",
   });
@@ -85,7 +90,7 @@ adminRouter.post("/login", async function (req, res) {
 
   const isValidPassword = await bcrypt.compare(password, admin.password);
 
-  if ((isValidPassword && admin)) {
+  if (isValidPassword && admin) {
     const token = jwt.sign(
       {
         id: admin._id,
@@ -107,7 +112,7 @@ adminRouter.post("/create-course", adminAuth, async function (req, res) {
   if (!parsed.success) {
     res.json({
       message: "Invalid Data Format.",
-      error: parsed.error.issues
+      error: parsed.error.issues,
     });
     return;
   }
@@ -125,7 +130,7 @@ adminRouter.post("/create-course", adminAuth, async function (req, res) {
 
     res.json({
       message: "Course Created Successfully.",
-      courseId: course._id
+      courseId: course._id,
     });
   } catch (error) {
     res.status(403).json({
@@ -134,7 +139,42 @@ adminRouter.post("/create-course", adminAuth, async function (req, res) {
   }
 });
 
-adminRouter.post("/delete-course", function (req, res) {});
+adminRouter.post("/update-course", adminAuth, async function (req, res) {
+  const adminId = req.adminId;
+  const parsed = courseSchema.safeParse(req.body);
+
+  if (!parsed.success) {
+    res.json({
+      message: "Invalid Data Format.",
+    });
+    return;
+  }
+  try {
+    const { title, description, price, imageUrl, courseId } = parsed.data;
+
+    const course = await courseModel.updateOne(
+      {
+        creator: adminId,
+        _id: courseId,
+      },
+      {
+        title: title,
+        description: description,
+        price: price,
+        imageUrl: imageUrl,
+      }
+    );
+
+    res.json({
+      message: "Course Updated Successfully",
+      courseId: course._id,
+    });
+  } catch (e) {
+    res.json({
+      message: "Unable to Update the course.",
+    });
+  }
+});
 
 adminRouter.post("/course-content", function (req, res) {});
 

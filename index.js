@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
@@ -19,9 +21,7 @@ app.use("/course", courseRouter);
 // Router for Admin.
 app.use("/admin", adminRouter);
 async function main() {
-  await mongoose.connect(
-    "mongodb+srv://Ken:%40Y2a0s0h4@cluster0.rrelns0.mongodb.net/coursera-app"
-  );
+  await mongoose.connect(process.env.Mongo_URL);
 
   console.log("Database Connected.");
 
