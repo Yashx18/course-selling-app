@@ -27,7 +27,7 @@ const loginSchema = z.object({
 const courseSchema = z.object({
   title: z.string().min(3),
   description: z.string().min(3),
-  price: z.number().min(3),
+  price: z.number(),
   imageUrl: z.string().min(3),
 });
 
@@ -83,7 +83,7 @@ adminRouter.post("/login", async function (req, res) {
 
   if (!admin) {
     res.json({
-      message: "admin not found.",
+      message: "Email or Password is Incorrect.",
     });
     return;
   }
@@ -139,7 +139,8 @@ adminRouter.post("/create-course", adminAuth, async function (req, res) {
   }
 });
 
-adminRouter.post("/update-course", adminAuth, async function (req, res) {
+// Updating Course Route
+adminRouter.put("/update-course", adminAuth, async function (req, res) {
   const adminId = req.adminId;
   const parsed = courseSchema.safeParse(req.body);
 
