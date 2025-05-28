@@ -9,6 +9,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { JWT_USER_SECRET } = require("../config.js");
 const { userAuth } = require("../middlewares/userM.js");
+const { error } = require("console");
 
 const signupSchema = z.object({
   email: z.string().email(),
@@ -88,13 +89,20 @@ userRouter.post("/login", async function (req, res) {
 userRouter.get("/purchases", userAuth, async function (req, res) {
   const userId = req.userId;
 
-  const purchases = await purchaseModel.find({
-    userId,
-  });
+  try {
+    const purchases = await purchaseModel.find({
+      userId,
+    });
 
-  res.json({
-    courses: purchases,
-  });
+    res.json({
+      courses: purchases,
+    });
+  } catch (e) {
+    res.json({
+      message: "Unable to display all the courses.",
+      error: e,
+    });
+  }
 });
 
 module.exports = {

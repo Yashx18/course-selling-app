@@ -7,7 +7,6 @@ const { z } = require("zod");
 
 const { JWT_ADMIN_SECRET } = require("../config.js");
 const { adminAuth } = require("../middlewares/adminM.js");
-const { error } = require("console");
 
 // SignUp Schema
 const signupSchema = z.object({
@@ -29,6 +28,20 @@ const courseSchema = z.object({
   description: z.string().min(3),
   price: z.number(),
   imageUrl: z.string().min(3),
+});
+
+// Update-Course Schema
+const updateCourseSchema = z.object({
+  title: z.string().min(3),
+  description: z.string().min(3),
+  price: z.number(),
+  imageUrl: z.string().min(3),
+  courseId: z.string().length(24),
+});
+
+// Delete-Course Schema
+const deleteCourseSchema = z.object({
+  courseId: z.string().length(24),
 });
 
 // SignIn Route
@@ -142,7 +155,7 @@ adminRouter.post("/create-course", adminAuth, async function (req, res) {
 // Updating Course Route
 adminRouter.put("/update-course", adminAuth, async function (req, res) {
   const adminId = req.adminId;
-  const parsed = courseSchema.safeParse(req.body);
+  const parsed = updateCourseSchema.safeParse(req.body);
 
   if (!parsed.success) {
     res.json({
@@ -168,7 +181,8 @@ adminRouter.put("/update-course", adminAuth, async function (req, res) {
 
     res.json({
       message: "Course Updated Successfully",
-      courseId: course._id,
+      course,
+      // courseId: course._id,
     });
   } catch (e) {
     res.json({
@@ -177,7 +191,40 @@ adminRouter.put("/update-course", adminAuth, async function (req, res) {
   }
 });
 
-adminRouter.post("/course-content", function (req, res) {});
+adminRouter.delete("/delete-course", adminAuth, async function (req, res) {
+  const adminId = req.adminId;
+  const parsed = deleteCourseSchema.safeParse(req.body);
+
+  if (!parsed.success) {
+    res.json({
+      message: "Invalid Data Format.",
+    });
+    return;
+  }
+  try {
+    const { courseId } = parsed.data;
+
+    const course = await courseModel.deleteOne(
+      {
+        creator: adminId,
+        _id: courseId,
+      },
+      {
+        _id: courseId,
+      }
+    );
+
+    res.json({
+      message: "Course Deleted Successfully",
+      course,
+      // courseId: course._id,
+    });
+  } catch (e) {
+    res.json({
+      message: "Unable to Update the course.",
+    });
+  }
+});
 
 module.exports = {
   adminRouter: adminRouter,
